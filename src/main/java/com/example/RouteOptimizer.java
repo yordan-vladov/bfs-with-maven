@@ -148,6 +148,40 @@ public class RouteOptimizer {
         return shortestRoutePath;
     }
 
+    public static ArrayList<String> twoOpt(ArrayList<String> route,
+            HashMap<Pair, Integer> shortestDistances,
+            HashMap<Pair, Integer> productToCheckoutDistances,
+            HashMap<String, Integer> entranceToProductsDistances,
+            HashMap<String, Integer> exitToCheckoutsDistances) {
+        boolean improved = true;
+        while (improved) {
+            improved = false;
+            for (int i = 1; i < route.size() - 3; i++) {
+                for (int j = i + 1; j < route.size() - 2; j++) {
+                    ArrayList<String> newRoute = twoOptSwap(route, i, j);
+                    int currentDistance = calculateRouteDistance(route, shortestDistances, productToCheckoutDistances,
+                            entranceToProductsDistances, exitToCheckoutsDistances);
+                    int newDistance = calculateRouteDistance(newRoute, shortestDistances, productToCheckoutDistances,
+                            entranceToProductsDistances, exitToCheckoutsDistances);
+                    if (newDistance < currentDistance) {
+                        route = newRoute;
+                        improved = true;
+                    }
+                }
+            }
+        }
+        return route;
+    }
+
+    public static ArrayList<String> twoOptSwap(ArrayList<String> route, int i, int j) {
+        ArrayList<String> newRoute = new ArrayList<>(route.subList(0, i));
+        ArrayList<String> subList = new ArrayList<>(route.subList(i, j + 1));
+        java.util.Collections.reverse(subList);
+        newRoute.addAll(subList);
+        newRoute.addAll(route.subList(j + 1, route.size()));
+        return newRoute;
+    }
+
     public static void main(String[] args) {
 
         HashMap<Pair, Integer> shortestDistances = HashMapUtils
@@ -178,12 +212,16 @@ public class RouteOptimizer {
         // Insert the best golden egg that increases the route distance minimally
         shortestRoute = insertBestGoldenEgg(shortestRoute, goldenEggs, shortestDistances);
 
-        // Calculate the total distance of the route with the best golden egg
+        // Optimize the route using 2-opt algorithm
+        shortestRoute = twoOpt(shortestRoute, shortestDistances, productToCheckoutDistances,
+                entranceToProductsDistances, exitToCheckoutsDistances);
+
+        // Calculate the total distance of the optimized route
         int totalDistance = calculateRouteDistance(shortestRoute, shortestDistances, productToCheckoutDistances,
                 entranceToProductsDistances, exitToCheckoutsDistances);
 
-        // Print the route and the total distance
-        System.out.println("Route with the Best Golden Egg: " + shortestRoute);
+        // Print the optimized route and the total distance
+        System.out.println("Optimized Route: " + shortestRoute);
         System.out.println("Total Distance: " + totalDistance);
 
         ArrayList<List<int[]>> shortestRoutePath = getShortestRoutePath(CoordinateMatrix.extractMatrix(),
