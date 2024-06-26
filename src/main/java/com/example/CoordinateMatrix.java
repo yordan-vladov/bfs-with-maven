@@ -2,12 +2,8 @@ package com.example;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class CoordinateMatrix {
 
@@ -316,126 +312,23 @@ public class CoordinateMatrix {
         return distances;
     }
 
-    public static void saveToFile(String filename, JSONObject jsonObject) {
-        try (FileWriter fileWriter = new FileWriter(filename)) {
-            fileWriter.write(jsonObject.toString()); // 4 is the number of spaces to indent
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void saveRoutesBetweenProducts(String[][] matrix) {
-        HashMap<String, int[]> products = findProducts(matrix);
-        HashMap<Pair, List<int[]>> routes = new HashMap<>();
-
-        for (String i : products.keySet()) {
-            for (String j : products.keySet()) {
-                if (!i.equals(j)) {
-                    int[] start = products.get(i);
-                    int[] end = products.get(j);
-                    List<int[]> path = bfsWithPath(matrix, start, end);
-                    if (path != null) {
-                        routes.put(new Pair(i, j), path);
-                    }
-                }
-            }
-        }
-
-        saveRoutesToFile(routes, "routesBetweenProducts.txt");
-    }
-
-    public static void saveRoutesFromExitToCheckouts(String[][] matrix) {
-        int[] exit = findExit(matrix);
-        HashMap<String, int[]> checkouts = findCheckouts(matrix);
-        HashMap<String, List<int[]>> routes = new HashMap<>();
-
-        for (String checkout : checkouts.keySet()) {
-            int[] start = exit;
-            int[] end = checkouts.get(checkout);
-            List<int[]> path = bfsWithPath(matrix, start, end);
-            if (path != null) {
-                routes.put(checkout, path);
-            }
-        }
-
-        saveRoutesToFile(routes, "routesFromExitToCheckouts.txt");
-    }
-
-    public static void saveRoutesFromProductsToCheckouts(String[][] matrix) {
-        HashMap<String, int[]> products = findProducts(matrix);
-        HashMap<String, int[]> checkouts = findCheckouts(matrix);
-        HashMap<Pair, List<int[]>> routes = new HashMap<>();
-
-        for (String product : products.keySet()) {
-            for (String checkout : checkouts.keySet()) {
-                int[] start = products.get(product);
-                int[] end = checkouts.get(checkout);
-                List<int[]> path = bfsWithPath(matrix, start, end);
-                if (path != null) {
-                    routes.put(new Pair(product, checkout), path);
-                }
-            }
-        }
-
-        saveRoutesToFile(routes, "routesFromProductsToCheckouts.txt");
-    }
-
-    public static void saveRoutesFromEntranceToProducts(String[][] matrix) {
-        int[] entrance = findEntrance(matrix);
-        HashMap<String, int[]> products = findProducts(matrix);
-        HashMap<String, List<int[]>> routes = new HashMap<>();
-
-        for (String product : products.keySet()) {
-            int[] start = entrance;
-            int[] end = products.get(product);
-            List<int[]> path = bfsWithPath(matrix, start, end);
-            if (path != null) {
-                routes.put(product, path);
-            }
-        }
-
-        saveRoutesToFile(routes, "routesFromEntranceToProducts.txt");
-    }
-
-    private static void saveRoutesToFile(HashMap<?, List<int[]>> routes, String filename) {
-        JSONObject jsonRoutes = new JSONObject();
-
-        for (Map.Entry<?, List<int[]>> entry : routes.entrySet()) {
-            JSONArray jsonPath = new JSONArray();
-            for (int[] coord : entry.getValue()) {
-                JSONArray jsonCoord = new JSONArray();
-                jsonCoord.put(coord[0]);
-                jsonCoord.put(coord[1]);
-                jsonPath.put(jsonCoord);
-            }
-            jsonRoutes.put(entry.getKey().toString(), jsonPath);
-        }
-
-        saveToFile(filename, jsonRoutes);
-    }
-
     public static void saveRoutesToFiles() {
         String[][] matrix = extractMatrix();
 
         HashMap<Pair, Integer> shortestDistances = findShortestDistancesBetweenProducts(matrix);
-        HashMapUtils.saveHashMapToFile(shortestDistances, "shortestDistances.txt");
+        HashMapUtils.saveHashMapToFile(shortestDistances, "shortestDistances.json");
 
         HashMap<Pair, Integer> productToCheckoutDistances = findShortestDistancesBetweenProductsAndCheckouts(matrix);
         HashMapUtils.saveHashMapToFile(productToCheckoutDistances,
-                "productToCheckoutDistances.txt");
+                "productToCheckoutDistances.json");
 
         HashMap<String, Integer> entranceToProductsDistances = findShortestDistancesFromEntranceToProducts(matrix);
         HashMapUtils.saveHashMapToFile(entranceToProductsDistances,
-                "entranceToProductsDistances.txt");
+                "entranceToProductsDistances.json");
 
         HashMap<String, Integer> exitToCheckoutsDistances = findShortestDistancesFromExitToCheckouts(matrix);
         HashMapUtils.saveHashMapToFile(exitToCheckoutsDistances,
-                "exitToCheckoutsDistances.txt");
-
-        saveRoutesBetweenProducts(matrix);
-        saveRoutesFromEntranceToProducts(matrix);
-        saveRoutesFromProductsToCheckouts(matrix);
-        saveRoutesFromExitToCheckouts(matrix);
+                "exitToCheckoutsDistances.json");
     }
 
     public static void testBfs() {

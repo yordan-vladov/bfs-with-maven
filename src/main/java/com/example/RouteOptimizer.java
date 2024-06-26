@@ -185,16 +185,16 @@ public class RouteOptimizer {
     public static void main(String[] args) {
 
         HashMap<Pair, Integer> shortestDistances = HashMapUtils
-                .extractDistancePairHashMapFromFile("shortestDistances.txt");
+                .extractDistancePairHashMapFromFile("shortestDistances.json");
 
         HashMap<Pair, Integer> productToCheckoutDistances = HashMapUtils
-                .extractDistancePairHashMapFromFile("productToCheckoutDistances.txt");
+                .extractDistancePairHashMapFromFile("productToCheckoutDistances.json");
 
         HashMap<String, Integer> entranceToProductsDistances = HashMapUtils
-                .extractDistanceHashMapFromFile("entranceToProductsDistances.txt");
+                .extractDistanceHashMapFromFile("entranceToProductsDistances.json");
 
         HashMap<String, Integer> exitToCheckoutsDistances = HashMapUtils
-                .extractDistanceHashMapFromFile("exitToCheckoutsDistances.txt");
+                .extractDistanceHashMapFromFile("exitToCheckoutsDistances.json");
 
         String entrance = "EN";
 
