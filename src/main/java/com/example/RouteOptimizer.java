@@ -182,6 +182,52 @@ public class RouteOptimizer {
         return newRoute;
     }
 
+    public static ArrayList<List<int[]>> optimiseRoute(String[] products) {
+
+        HashMap<Pair, Integer> shortestDistances = HashMapUtils
+                .extractDistancePairHashMapFromFile("shortestDistances.json");
+
+        HashMap<Pair, Integer> productToCheckoutDistances = HashMapUtils
+                .extractDistancePairHashMapFromFile("productToCheckoutDistances.json");
+
+        HashMap<String, Integer> entranceToProductsDistances = HashMapUtils
+                .extractDistanceHashMapFromFile("entranceToProductsDistances.json");
+
+        HashMap<String, Integer> exitToCheckoutsDistances = HashMapUtils
+                .extractDistanceHashMapFromFile("exitToCheckoutsDistances.json");
+
+        String entrance = "EN";
+
+        String[] goldenEggs = { "P107", "P310", "P204", "P19", "P279" };
+
+        List<String> checkouts = new ArrayList<String>(exitToCheckoutsDistances.keySet());
+
+        String exit = "EX";
+
+        // Find the shortest route using the nearest neighbor algorithm
+        ArrayList<String> shortestRoute = findShortestRoute(entrance, exit, products, checkouts,
+                shortestDistances, productToCheckoutDistances, entranceToProductsDistances, exitToCheckoutsDistances);
+
+        // Insert the best golden egg that increases the route distance minimally
+        shortestRoute = insertBestGoldenEgg(shortestRoute, goldenEggs, shortestDistances);
+
+        // Optimize the route using 2-opt algorithm
+        shortestRoute = twoOpt(shortestRoute, shortestDistances, productToCheckoutDistances,
+                entranceToProductsDistances, exitToCheckoutsDistances);
+
+        // Calculate the total distance of the optimized route
+        int totalDistance = calculateRouteDistance(shortestRoute, shortestDistances, productToCheckoutDistances,
+                entranceToProductsDistances, exitToCheckoutsDistances);
+
+        // Print the optimized route and the total distance
+        System.out.println("Optimized Route: " + shortestRoute);
+        System.out.println("Total Distance: " + totalDistance);
+
+        return getShortestRoutePath(CoordinateMatrix.extractMatrix(),
+                shortestRoute);
+
+    }
+
     public static void main(String[] args) {
 
         HashMap<Pair, Integer> shortestDistances = HashMapUtils
