@@ -331,23 +331,6 @@ public class CoordinateMatrix {
                 "exitToCheckoutsDistances.json");
     }
 
-    public static void testBfs() {
-        String[][] matrix = extractMatrix();
-
-        List<int[]> list = bfsWithPath(matrix, new int[] { 5, 2 }, new int[] { 21, 18 });
-
-        for (int[] array : list) {
-            System.out.print("[");
-            for (int i = 0; i < array.length; i++) {
-                System.out.print(array[i]);
-                if (i < array.length - 1) {
-                    System.out.print(", ");
-                }
-            }
-            System.out.println("]");
-        }
-    }
-
     public static void main(String[] args) {
         // testBfs();
         saveRoutesToFiles();
